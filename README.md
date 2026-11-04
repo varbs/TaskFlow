@@ -1,5 +1,10 @@
 # TaskFlow – Playwright automation project (JavaScript)
 
+![Playwright Tests](https://github.com/varbs/TaskFlow/actions/workflows/playwright.yml/badge.svg)
+
+**Live demo:** https://taskflow-demo-project.netlify.app  
+Demo account: `user@test.com` / `Password123`
+
 A self-contained project: the **TaskFlow app under test** (Login, Tasks, Profile), its
 **specification** and a **Playwright test suite** with the Page Object Model.
 
@@ -13,7 +18,11 @@ npm run report                    # open the HTML report
 Run the app on its own: `npm start` → http://localhost:3000
 Demo account: `user@test.com` / `Password123`
 
-Test a different deployment: `BASE_URL=https://your-host npm test` (the local server is not started).
+Tests run locally and against the deployed site. To test the live deployment (the local server is not started):
+```bash
+BASE_URL=https://taskflow-demo-project.netlify.app npm test
+```
+(Windows PowerShell: `$env:BASE_URL="https://taskflow-demo-project.netlify.app"; npm test`)
 
 ## Structure
 ```
@@ -38,3 +47,12 @@ tests/          auth/ tasks/ profile/ specs, each test tagged with requirement i
 - Assumptions marked `[Assumed]` in the spec (for example the Profile error texts and the
   edit-row error `edit-error`) are implemented as written; change `app/app.js` and
   `test-data/messages.js` together if the real rules differ.
+
+## CI
+GitHub Actions (`.github/workflows/playwright.yml`) runs the suite on every push and pull request to `main`
+and uploads the HTML report as an artifact (Actions tab → run → Artifacts → `playwright-report`).
+
+## Free hosting
+The app is static, so it deploys as-is. Publish the `app/` folder; `app/_redirects`, `netlify.toml` and
+`vercel.json` make `/login`, `/tasks` and `/profile` work on Netlify, Cloudflare Pages and Vercel.
+Run the tests against the live site: `BASE_URL=https://taskflow-demo-project.netlify.app npm test`
