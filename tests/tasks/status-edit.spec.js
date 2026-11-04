@@ -2,17 +2,17 @@ const { test, expect } = require('../../fixtures');
 const { daysFromToday } = require('../../utils/dates');
 const msg = require('../../test-data/messages');
 
-test.describe('Complete and edit task', () => {
+test.describe('Complete and edit task', { tag: '@regression' }, () => {
   test.beforeEach(async ({ loggedIn }) => {});
 
-  test('@p1 checking a task completes it and updates the counter (TASK-12, TASK-13)', async ({ tasksPage }) => {
+  test('@smoke checking a task completes it and updates the counter (TASK-12, TASK-13)', async ({ tasksPage }) => {
     await tasksPage.toggle('Write test plan');
     await expect(tasksPage.row('Write test plan').getByTestId('task-checkbox')).toBeChecked();
     await expect(tasksPage.row('Write test plan').getByTestId('task-title')).toHaveCSS('text-decoration-line', 'line-through');
     await tasksPage.expectItemsLeft(2);
   });
 
-  test('@p1 unchecking reverses completion (TASK-12)', async ({ tasksPage }) => {
+  test('@smoke unchecking reverses completion (TASK-12)', async ({ tasksPage }) => {
     await tasksPage.toggle('Update README');
     await expect(tasksPage.row('Update README').getByTestId('task-checkbox')).not.toBeChecked();
     await tasksPage.expectItemsLeft(4);
@@ -31,17 +31,17 @@ test.describe('Complete and edit task', () => {
     await expect(tasksPage.row('Book team retro').getByTestId('task-checkbox')).toBeChecked();
   });
 
-  test('@p1 Edit shows prefilled inputs with Save and Cancel (TASK-16)', async ({ tasksPage }) => {
+  test('@smoke Edit shows prefilled inputs with Save and Cancel (TASK-16)', async ({ tasksPage }) => {
     await tasksPage.startEdit('Review pull request');
     const r = tasksPage.editRow;
     await expect(r.getByTestId('edit-title-input')).toHaveValue('Review pull request');
     await expect(r.getByTestId('edit-priority-select')).toHaveValue('High');
-    await expect(r.getByTestId('edit-due-input')).toHaveValue('2026-11-05');
+    await expect(r.getByTestId('edit-due-input')).toHaveValue(daysFromToday(1)); // seed due date
     await expect(r.getByTestId('save-button')).toBeVisible();
     await expect(r.getByTestId('cancel-button')).toBeVisible();
   });
 
-  test('@p1 Save applies title, priority and due date (TASK-17, TASK-20)', async ({ tasksPage }) => {
+  test('@smoke Save applies title, priority and due date (TASK-17, TASK-20)', async ({ tasksPage }) => {
     const due = daysFromToday(7);
     await tasksPage.startEdit('Write test plan');
     await tasksPage.fillEdit({ title: 'Write test strategy', priority: 'High', due });
@@ -53,7 +53,7 @@ test.describe('Complete and edit task', () => {
     await expect(tasksPage.editRow).toHaveCount(0);
   });
 
-  test('@p1 Cancel discards changes (TASK-18)', async ({ tasksPage }) => {
+  test('@smoke Cancel discards changes (TASK-18)', async ({ tasksPage }) => {
     await tasksPage.startEdit('Write test plan');
     await tasksPage.fillEdit({ title: 'Changed', priority: 'Low' });
     await tasksPage.cancelEdit();
@@ -62,7 +62,7 @@ test.describe('Complete and edit task', () => {
     await expect(tasksPage.row('Changed')).toHaveCount(0);
   });
 
-  test('@p1 Save with empty title is rejected (TASK-19)', async ({ tasksPage }) => {
+  test('@smoke Save with empty title is rejected (TASK-19)', async ({ tasksPage }) => {
     await tasksPage.startEdit('Write test plan');
     await tasksPage.fillEdit({ title: '' });
     await tasksPage.saveEdit();

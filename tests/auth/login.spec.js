@@ -2,12 +2,12 @@ const { test, expect } = require('../../fixtures');
 const { validUser } = require('../../test-data/users');
 const msg = require('../../test-data/messages');
 
-test.describe('Login', () => {
+test.describe('Login', { tag: '@regression' }, () => {
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
   });
 
-  test('@p1 shows email, password, button and demo hint (AUTH-01)', async ({ loginPage }) => {
+  test('@smoke shows email, password, button and demo hint (AUTH-01)', async ({ loginPage }) => {
     await expect(loginPage.email).toBeVisible();
     await expect(loginPage.password).toBeVisible();
     await expect(loginPage.loginButton).toHaveText('Log in');
@@ -19,13 +19,13 @@ test.describe('Login', () => {
     await expect(loginPage.password).toHaveAttribute('type', 'password');
   });
 
-  test('@p1 valid credentials open the Tasks page (AUTH-03)', async ({ page, loginPage }) => {
+  test('@smoke valid credentials open the Tasks page (AUTH-03)', async ({ page, loginPage }) => {
     await loginPage.login(validUser.email, validUser.password);
     await expect(page).toHaveURL(/\/tasks$/);
     await expect(page.getByTestId('add-task-button')).toBeVisible();
   });
 
-  test('@p1 empty form shows required error (AUTH-04, AUTH-07)', async ({ page, loginPage }) => {
+  test('@smoke @a11y empty form shows required error (AUTH-04, AUTH-07)', async ({ page, loginPage }) => {
     await loginPage.loginButton.click();
     await loginPage.expectError(msg.loginRequired);
     await expect(loginPage.error).toHaveAttribute('role', 'alert');
@@ -34,17 +34,17 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/\/login$/);
   });
 
-  test('@p1 email only shows required error (AUTH-04)', async ({ loginPage }) => {
+  test('@smoke email only shows required error (AUTH-04)', async ({ loginPage }) => {
     await loginPage.login(validUser.email, '');
     await loginPage.expectError(msg.loginRequired);
   });
 
-  test('@p1 password only shows required error (AUTH-04)', async ({ loginPage }) => {
+  test('@smoke password only shows required error (AUTH-04)', async ({ loginPage }) => {
     await loginPage.login('', validUser.password);
     await loginPage.expectError(msg.loginRequired);
   });
 
-  test('@p1 wrong password shows invalid error (AUTH-05)', async ({ page, loginPage }) => {
+  test('@smoke wrong password shows invalid error (AUTH-05)', async ({ page, loginPage }) => {
     await loginPage.login(validUser.email, 'WrongPass1');
     await loginPage.expectError(msg.loginInvalid);
     await expect(page).toHaveURL(/\/login$/);
@@ -65,14 +65,14 @@ test.describe('Login', () => {
     await loginPage.expectError(msg.loginInvalid);
   });
 
-  test('@p1 log out returns to Login (AUTH-08)', async ({ page, loginPage, tasksPage }) => {
+  test('@smoke log out returns to Login (AUTH-08)', async ({ page, loginPage, tasksPage }) => {
     await loginPage.login(validUser.email, validUser.password);
     await tasksPage.nav.logoutButton.click();
     await expect(page).toHaveURL(/\/login$/);
     await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test('@p1 protected pages redirect to Login when logged out (AUTH-09)', async ({ page }) => {
+  test('@smoke protected pages redirect to Login when logged out (AUTH-09)', async ({ page }) => {
     await page.goto('/tasks');
     await expect(page).toHaveURL(/\/login$/);
     await page.goto('/profile');

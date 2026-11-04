@@ -2,10 +2,10 @@ const { test, expect } = require('../../fixtures');
 const msg = require('../../test-data/messages');
 const { seedTitles } = require('../../test-data/tasks');
 
-test.describe('Delete and clear completed', () => {
+test.describe('Delete and clear completed', { tag: '@regression' }, () => {
   test.beforeEach(async ({ loggedIn }) => {});
 
-  test('@p1 Delete removes the task immediately, no dialog (TASK-22)', async ({ page, tasksPage }) => {
+  test('@smoke Delete removes the task immediately, no dialog (TASK-22)', async ({ page, tasksPage }) => {
     let dialogSeen = false;
     page.on('dialog', async (d) => { dialogSeen = true; await d.dismiss(); });
     await tasksPage.remove('Review pull request');
@@ -14,17 +14,17 @@ test.describe('Delete and clear completed', () => {
     expect(dialogSeen).toBe(false);
   });
 
-  test('@p1 deleting an unchecked task decreases items left (TASK-23)', async ({ tasksPage }) => {
+  test('@smoke deleting an unchecked task decreases items left (TASK-23)', async ({ tasksPage }) => {
     await tasksPage.remove('Write test plan');
     await tasksPage.expectItemsLeft(2);
   });
 
-  test('@p1 deleting a checked task keeps items left (TASK-23)', async ({ tasksPage }) => {
+  test('@smoke deleting a checked task keeps items left (TASK-23)', async ({ tasksPage }) => {
     await tasksPage.remove('Update README');
     await tasksPage.expectItemsLeft(3);
   });
 
-  test('@p1 Clear completed removes only checked tasks (TASK-24)', async ({ tasksPage }) => {
+  test('@smoke Clear completed removes only checked tasks (TASK-24)', async ({ tasksPage }) => {
     await tasksPage.toggle('Write test plan');
     await tasksPage.clearCompleted.click();
     await tasksPage.expectTitles(['Review pull request', 'Book team retro']);
@@ -37,7 +37,7 @@ test.describe('Delete and clear completed', () => {
     await expect(tasksPage.clearCompleted).toBeDisabled();
   });
 
-  test('@p1 deleting every task shows the empty state (TASK-26, TASK-27)', async ({ tasksPage }) => {
+  test('@smoke deleting every task shows the empty state (TASK-26, TASK-27)', async ({ tasksPage }) => {
     for (const title of ['Write test plan', 'Review pull request', 'Update README', 'Book team retro']) {
       await tasksPage.remove(title);
     }

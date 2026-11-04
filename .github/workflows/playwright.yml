@@ -8,8 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    timeout-minutes: 30
+  # Fast gate: P1 tests (@smoke) on Chromium. Regression only runs if this passes.
+  smoke:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,14 +27,48 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       # playwright.config.js starts the app (node server.js) via webServer
-      - name: Run Playwright tests
-        run: npx playwright test
+      - name: Run smoke tests
+        run: npx playwright test --grep @smoke --project=chromium
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: smoke-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Full suite (@regression) on Chromium, Firefox and WebKit.
+  regression:
+    needs: smoke
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.project }}
+
+      - name: Run regression tests
+        run: npx playwright test --grep @regression --project=${{ matrix.project }}
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.project }}
           path: playwright-report/
           retention-days: 30
 
@@ -41,6 +76,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: test-results
+          name: test-results-${{ matrix.project }}
           path: test-results/
           retention-days: 7

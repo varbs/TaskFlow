@@ -5,11 +5,12 @@
 
   var USER = { email: 'user@test.com', password: 'Password123' };
   var KEYS = { session: 'tf_session', tasks: 'tf_tasks', profile: 'tf_profile' };
+  // Seed due dates are relative to today so they never fall into the past.
   var SEED_TASKS = [
-    { id: 1, title: 'Write test plan', priority: 'Medium', due: '2026-11-06', done: false },
-    { id: 2, title: 'Review pull request', priority: 'High', due: '2026-11-05', done: false },
-    { id: 3, title: 'Update README', priority: 'Low', due: '2026-11-10', done: true },
-    { id: 4, title: 'Book team retro', priority: 'Medium', due: '2026-11-12', done: false },
+    { id: 1, title: 'Write test plan', priority: 'Medium', due: daysFromTodayISO(2), done: false },
+    { id: 2, title: 'Review pull request', priority: 'High', due: daysFromTodayISO(1), done: false },
+    { id: 3, title: 'Update README', priority: 'Low', due: daysFromTodayISO(6), done: true },
+    { id: 4, title: 'Book team retro', priority: 'Medium', due: daysFromTodayISO(8), done: false },
   ];
   var SEED_PROFILE = { fullName: 'Test User', email: 'user@test.com', phone: '5551234567' };
 
@@ -34,8 +35,10 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function todayISO() {
+  function todayISO() { return daysFromTodayISO(0); }
+  function daysFromTodayISO(offset) {
     var d = new Date();
+    d.setDate(d.getDate() + offset);
     var m = String(d.getMonth() + 1).padStart(2, '0');
     var day = String(d.getDate()).padStart(2, '0');
     return d.getFullYear() + '-' + m + '-' + day;
