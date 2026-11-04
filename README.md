@@ -8,6 +8,11 @@ Demo account: `user@test.com` / `Password123`
 A self-contained project: the **TaskFlow app under test** (Login, Tasks, Profile), its
 **specification** and a **Playwright test suite** with the Page Object Model.
 
+**Test counts:** the spec's catalogue (`docs/SPECIFICATION.md` section 10) defines **69 test cases**;
+the suite runs **76 automated tests** (`npx playwright test --list`). The numbers differ because
+data-driven cases run once per input (4 invalid emails, 4 invalid phones, 3 priorities) and a few
+extra checks, such as persistence after reload, have no catalogue ID.
+
 ## Quick start
 ```bash
 npm install
